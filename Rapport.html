@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>IFT3911 - Devoir 1 - Système de Réservation</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 40px; }
+h1, h2, h3 { color: #003366; }
+table { border-collapse: collapse; width: 100%; margin-top: 15px; }
+th, td { border: 1px solid black; padding: 8px; text-align: center; }
+img { max-width: 100%; margin-top: 15px; }
+.section { margin-top: 50px; }
+
+</style>
+</head>
+
+<body>
+ 
+<h1> <center>IFT3911 - Hiver 2026</center> </h1>
+<h2> <center>Devoir  2</center> </h2>
+<h2><center>Modélisation et analyse</center></h2>
+
+<hr>
+
+<h2>Équipe Tango </h2>
+
+<ul>
+<li><strong>Dabo Fahîma :</strong> tunwend-raabo.fahima.c.dabo@umontreal.ca | Matricule : 6362 | Temps investi : 38 heures </li><br>
+<li><strong>Jean Paul Marc Olivier  :</strong>  marc.olivier.jean.paul@umontreal.ca | Matricule : 1763 | Temps investi : 40 heures</li><br>
+<li><strong>Guinguiere Reine :</strong> wendkuni.reine.rosine.guinguiere@umontreal.ca | Matricule : 1523 | Temps investi : 36 heures</li><br>
+<li><strong>RahmouniAbdelghafour :</strong> abdel.ghafour.rahmouni@umontreal.ca | Matricule : 6224 | Temps investi : 39 heures</li>
+</ul>
+
+<br>
+
+<div class="Réseau de Pétri">
+<h2>1. Réseau de Pétri : Tunnel</h2>
+<img src="3911_petri.png" alt="Réseau de Pétri - Tunnel">
+
+</div>
+
+<div class="Statechart">
+<h2>2. Statechart: Four à micro-onde</h2>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class=" RévisionDesign">
+
+<h2>3. Révision du design logiciel du Devoir 1</h2>
+
+
+
+
+
+<h3>3.1 Design logiciel révisé</h3>
+
+<p><b>Liste des modules reutilisables : l'objectif ici est de faire ressortir la modularité du système en identifiant les composants 
+    qui favorisent la réutilisation et la maintenance </b></p>
+</br></br>
+
+<li><b>Voyage</b></li>  </br >
+a. La classe Voyage est un module réutilisable car elle encapsule la logique de gestion d’un voyage (vol, itinéraire, Trajet) 
+de manière indépendante des types spécifiques de transport (avion, bateau, train). Elle peut être utilisée dans différents contextes 
+de réservation sans modification majeure. Par exemple, si nous voulons ajouter un nouveau type de voyage (Routier), nous n’aurions pas besoin 
+de modifier la classe Voyage, mais simplement d’ajouter une nouvelle classe qui hérite de LieuTransport. </br></br>
+
+b. Couplage Faible :En s'appuyant sur le principe d'inversion des dépendances (<b>DIP</b>), la classe Voyage maintient un couplage faible en dépendant d'abstractions (comme LieuTransport et Compagnie).
+ Cela permet de réduire les dépendances entre les modules et facilite la maintenance et l’extension du système. </br></br>
+
+c. Cohésion forte: elle regroupe toutes les données nécessaires à la planification d'un Voyage (départ, arrivée, durée). 
+Elle  peut intégrer de nouveaux types de voyage (comme le bus) sans modification interne, respectant ainsi le principe ouvert/fermé (<b>OCP</b>). </br></br>
+
+<li><b>LieuTransport</b></li> </br >
+<p>
+a.	La classe LieuTransport est une abstraction et un polymorphisme ce qui fait que les autres classes par exemple Voyage, vont interagir 
+avec l’abstraction plutôt qu’avec les types spécifiques (Aeroport, Port, Gare). Cette classe est réutilisable dans d’autres systèmes de transport 
+car s’il faut rajouter d’autres lieux de transport il ne faut pas modifier la classe LieuTransport ou les contrôleurs. Le module respecte le 
+principe <b>OCP</b> : ouvert à l’extension, mais fermé à la modification. </br></br>
+b.	Couplage Faible : le module est indépendant de la logistique du vol ou de l'itinéraire  qui ont tous les deux un lieu de destination 
+et un lieu de départ (les associations "revient de" et "va vers" liées à la classe Voyage). On peut donc extraire LieuTransport dans une autre 
+application sans avoir à importer la logique de réservations et des paiements.  </br></br>
+c.	Cohésion forte: La classe LieuTransport et ses enfants ne s'occupent que d'une chose : identifier et localiser 
+un point géographique (sigle, ville, pays). Elle ne gère pas le prix des billets, ni les données des clients. 
+Cette responsabilité unique rend le module facile à comprendre et à tester isolément </br></br>
+</p> </br>
+
+<li><b>Reservation</b></li> </br >
+La classe Reservation encapsule la logique transactionnelle du système. Ce module est conçu 
+pour être réutilisable dans divers contextes de réservation (hôtellerie, location) car 
+il gère principalement une machine à états (Confirmée, Annulée, Réservée). 
+Sa cohésion est logique car  elle  differère du  cycle de vie d'une réservation de la logique du transport. 
+Le couplage est réduit par l'utilisation de l'énumération Etat, évitant ainsi de disperser 
+la logique de contrôle dans le reste de l'application. En séparant la réservation du transport physique, 
+on permet au système d'évoluer de manière indépendante. Dans cette logique elle respecte bien le Single Responsability Principle (<b>SRP</b>).</br></br>
+
+<li><b>Section</b></li> </br >
+Le module Section définit la structure spatiale et tarifaire d'un véhicule. Sa réutilisabilité est démontrée 
+par sa capacité à modéliser n'importe quel inventaire divisé en catégories (classe économique, cabine, etc.). 
+Grâce à l'héritage, la classe abstraite Section découple la gestion des prix et des capacités de la nature du véhicule (avion ou paquebot). 
+Elle présente une cohésion fonctionnelle forte, se concentrant uniquement sur la disposition et le calcul des tarifs. Ce design permet d'ajouter 
+de nouvelles configurations de sièges ou de cabines sans impacter les contrôleurs de réservation. </br></br>
+Les sections des avions, des trains ainsi que celles des paquebots étant différentes, la classe Section ne peut pas contenir toutes les méthodes relatives 
+à la gestion des sections. Voilà pourquoi la classe Section ne contient que les méthodes communes aux deux classes enfants. Cela fait référence au principe de substitution de Liskov (<b>LSP</b>) : 
+n'importe laquelle des classes enfants peut remplacer la classe parent sans que cela n'affecte le fonctionnement du système. </br></br>
+
+<li><b>Profil</b></li></br >
+a. La classe Profil est un module réutilisable car elle encapsule la logique de gestion d’un profil utilisateur (noms, courriel) 
+de manière indépendante des types spécifiques de transport (avion, bateau, train). Elle peut être utilisée dans différents contextes de réservation sans modification majeure. 
+Par exemple, si nous voulons ajouter un nouveau type de Profil (employé avec moins de permissions que l'admin), nous n’aurions pas besoin de modifier la classe Profil, mais simplement d’ajouter une nouvelle classe 
+qui hérite de Profil. </br></br>      
+En ce qui concerne le faible couplage  : Admin et client n'ayant pas des taches communes (il n'y a pas de tache qui peut se faire par les deux en meme temps), cela explique pourquoi la classe profil n'est associée 
+à aucune autre classe sauf pour l'heritage de "admin" et "client". </br></br>   
+
+
+<li><b>Compagnie</b></li></br >
+La classe Compagnie gère l'aspect organisationnel du système. Sa réutilisabilité est axée sur la gestion de l'identité des fournisseurs de services. 
+Elle maintient une cohésion forte en centralisant les informations administratives et tarifaires de base. Par une association avec Voyage, elle permet une extensibilité du réseau de transport 
+sans créer de dépendances cycliques. Ce module assure que les règles propres à une entreprise (comme le prixPleinTarif) restent isolées de la logistique technique des déplacements. </br></br>
+
+
+<h3>3.2 Qualités du design </h3>
+
+</div>
+
+
+<div class = "Contributions" > 
+
+<h2>4. Distribution des tâches</h2>
+
+
+
+<table>
+<tr>
+<th>Tâche</th>
+<th>Abdel </th>
+<th>Fahîma</th>
+<th>Olivier</th>
+<th>Reine</th>
+</tr>
+
+<tr>
+<td>Réseau de Pétri</td>
+<td>25%</td>
+<td>25%</td>
+<td>25%</td>
+<td>25%</td>
+</tr>
+
+<tr>
+<td>Statechart </td>
+<td>20%</td>
+<td>20%</td>
+<td>30%</td>
+<td>30%</td>
+</tr>
+
+<tr>
+<td>Révision design </td>
+<td>25%</td>
+<td>25%</td>
+<td>25%</td>
+<td>25%</td>
+</tr>
+
+<tr>
+<td>modules réutilisables </td>
+<td>20%</td>
+<td>30%</td>
+<td>20%</td>
+<td>30%</td>
+</tr>
+
+<tr>
+<td>Fardeaux des classes</td>
+<td>20%</td>
+<td>30%</td>
+<td>30%</td>
+<td>20%</td>
+</tr>
+
+
+<tr>
+<td> Rapport </td>
+<td>30%</td>
+<td>20%</td>
+<td>30%</td>
+<td>20%</td>
+</tr>
+</table>
+
+
+<p>
+Les contributions sont approximativement équilibrées. </p>
+Remettante du Tp: Reine GUINGUIERE
+</p>
+
+</div>  
+
+
+</body>
+</html>
