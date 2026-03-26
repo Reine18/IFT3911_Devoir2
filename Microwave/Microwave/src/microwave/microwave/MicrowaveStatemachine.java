@@ -123,10 +123,12 @@ public class MicrowaveStatemachine implements IMicrowaveStatemachine {
 		microwave_Finished,
 		microwave_Finished_r1_Bip_On,
 		microwave_Finished_r1_Bip_Off,
+		open_Close_Door_DoorOpen,
+		open_Close_Door_DoorClosed,
 		$NullState$
 	};
 	
-	private final State[] stateVector = new State[1];
+	private final State[] stateVector = new State[2];
 	
 	private int nextStateIndex;
 	
@@ -145,14 +147,14 @@ public class MicrowaveStatemachine implements IMicrowaveStatemachine {
 	}
 	
 	
-	private boolean isDoorOpen;
+	private boolean isDoorClose;
 	
-	protected boolean getIsDoorOpen() {
-		return isDoorOpen;
+	protected boolean getIsDoorClose() {
+		return isDoorClose;
 	}
 	
-	protected void setIsDoorOpen(boolean value) {
-		this.isDoorOpen = value;
+	protected void setIsDoorClose(boolean value) {
+		this.isDoorClose = value;
 	}
 	
 	
@@ -180,7 +182,7 @@ public class MicrowaveStatemachine implements IMicrowaveStatemachine {
 			throw new IllegalStateException("Operation callback for interface sCInterface must be set.");
 		}
 		
-		for (int i = 0; i < 1; i++) {
+		for (int i = 0; i < 2; i++) {
 			stateVector[i] = State.$NullState$;
 		}
 		clearEvents();
@@ -189,7 +191,7 @@ public class MicrowaveStatemachine implements IMicrowaveStatemachine {
 		
 		setEnteredTime(0);
 		
-		setIsDoorOpen(true);
+		setIsDoorClose(true);
 		
 		setRemainingTime(0);
 	}
@@ -204,6 +206,7 @@ public class MicrowaveStatemachine implements IMicrowaveStatemachine {
 			throw new IllegalStateException("timer not set.");
 		}
 		enterSequence_Microwave_default();
+		enterSequence_Open_Close_Door_default();
 	}
 	
 	public void runCycle() {
@@ -240,6 +243,12 @@ public class MicrowaveStatemachine implements IMicrowaveStatemachine {
 			case microwave_Finished_r1_Bip_Off:
 				microwave_Finished_r1_Bip_Off_react(true);
 				break;
+			case open_Close_Door_DoorOpen:
+				open_Close_Door_DoorOpen_react(true);
+				break;
+			case open_Close_Door_DoorClosed:
+				open_Close_Door_DoorClosed_react(true);
+				break;
 			default:
 				// $NullState$
 			}
@@ -248,13 +257,14 @@ public class MicrowaveStatemachine implements IMicrowaveStatemachine {
 	}
 	public void exit() {
 		exitSequence_Microwave();
+		exitSequence_Open_Close_Door();
 	}
 	
 	/**
 	 * @see IStatemachine#isActive()
 	 */
 	public boolean isActive() {
-		return stateVector[0] != State.$NullState$;
+		return stateVector[0] != State.$NullState$||stateVector[1] != State.$NullState$;
 	}
 	
 	/** 
@@ -311,6 +321,10 @@ public class MicrowaveStatemachine implements IMicrowaveStatemachine {
 			return stateVector[0] == State.microwave_Finished_r1_Bip_On;
 		case microwave_Finished_r1_Bip_Off:
 			return stateVector[0] == State.microwave_Finished_r1_Bip_Off;
+		case open_Close_Door_DoorOpen:
+			return stateVector[1] == State.open_Close_Door_DoorOpen;
+		case open_Close_Door_DoorClosed:
+			return stateVector[1] == State.open_Close_Door_DoorClosed;
 		default:
 			return false;
 		}
@@ -406,8 +420,6 @@ public class MicrowaveStatemachine implements IMicrowaveStatemachine {
 	
 	/* Entry action for state 'Waiting'. */
 	private void entryAction_Microwave_Waiting() {
-		setIsDoorOpen(true);
-		
 		sCInterface.operationCallback.display("Waiting");
 		
 		sCInterface.operationCallback.stopCook();
@@ -422,16 +434,16 @@ public class MicrowaveStatemachine implements IMicrowaveStatemachine {
 	
 	/* Entry action for state 'RestartCooking'. */
 	private void entryAction_Microwave_RestartCooking() {
-		sCInterface.operationCallback.displayTime(getRemainingTime());
+		sCInterface.operationCallback.displayTime(((((getRemainingTime() / 60)) * 100) + ((getRemainingTime() % 60))));
 	}
 	
 	/* Entry action for state 'Finished'. */
 	private void entryAction_Microwave_Finished() {
 		timer.setTimer(this, 1, (5 * 1000), false);
 		
-		sCInterface.operationCallback.openDoor();
-		
 		sCInterface.operationCallback.display("Finished");
+		
+		sCInterface.operationCallback.stopCook();
 	}
 	
 	/* Entry action for state 'Bip On'. */
@@ -446,6 +458,20 @@ public class MicrowaveStatemachine implements IMicrowaveStatemachine {
 		timer.setTimer(this, 3, 500, false);
 		
 		sCInterface.operationCallback.beepOff();
+	}
+	
+	/* Entry action for state 'DoorOpen'. */
+	private void entryAction_Open_Close_Door_DoorOpen() {
+		sCInterface.operationCallback.openDoor();
+		
+		setIsDoorClose(false);
+	}
+	
+	/* Entry action for state 'DoorClosed'. */
+	private void entryAction_Open_Close_Door_DoorClosed() {
+		sCInterface.operationCallback.closeDoor();
+		
+		setIsDoorClose(true);
 	}
 	
 	/* Exit action for state 'Cooking'. */
@@ -546,6 +572,20 @@ public class MicrowaveStatemachine implements IMicrowaveStatemachine {
 		stateVector[0] = State.microwave_Finished_r1_Bip_Off;
 	}
 	
+	/* 'default' enter sequence for state DoorOpen */
+	private void enterSequence_Open_Close_Door_DoorOpen_default() {
+		entryAction_Open_Close_Door_DoorOpen();
+		nextStateIndex = 1;
+		stateVector[1] = State.open_Close_Door_DoorOpen;
+	}
+	
+	/* 'default' enter sequence for state DoorClosed */
+	private void enterSequence_Open_Close_Door_DoorClosed_default() {
+		entryAction_Open_Close_Door_DoorClosed();
+		nextStateIndex = 1;
+		stateVector[1] = State.open_Close_Door_DoorClosed;
+	}
+	
 	/* 'default' enter sequence for region Microwave */
 	private void enterSequence_Microwave_default() {
 		react_Microwave__entry_Default();
@@ -564,6 +604,11 @@ public class MicrowaveStatemachine implements IMicrowaveStatemachine {
 	/* 'default' enter sequence for region r1 */
 	private void enterSequence_Microwave_Finished_r1_default() {
 		react_Microwave_Finished_r1__entry_Default();
+	}
+	
+	/* 'default' enter sequence for region Open/Close Door */
+	private void enterSequence_Open_Close_Door_default() {
+		react_Open_Close_Door__entry_Default();
 	}
 	
 	/* Default exit sequence for state Idle */
@@ -637,6 +682,18 @@ public class MicrowaveStatemachine implements IMicrowaveStatemachine {
 		exitAction_Microwave_Finished_r1_Bip_Off();
 	}
 	
+	/* Default exit sequence for state DoorOpen */
+	private void exitSequence_Open_Close_Door_DoorOpen() {
+		nextStateIndex = 1;
+		stateVector[1] = State.$NullState$;
+	}
+	
+	/* Default exit sequence for state DoorClosed */
+	private void exitSequence_Open_Close_Door_DoorClosed() {
+		nextStateIndex = 1;
+		stateVector[1] = State.$NullState$;
+	}
+	
 	/* Default exit sequence for region Microwave */
 	private void exitSequence_Microwave() {
 		switch (stateVector[0]) {
@@ -702,6 +759,20 @@ public class MicrowaveStatemachine implements IMicrowaveStatemachine {
 		}
 	}
 	
+	/* Default exit sequence for region Open/Close Door */
+	private void exitSequence_Open_Close_Door() {
+		switch (stateVector[1]) {
+		case open_Close_Door_DoorOpen:
+			exitSequence_Open_Close_Door_DoorOpen();
+			break;
+		case open_Close_Door_DoorClosed:
+			exitSequence_Open_Close_Door_DoorClosed();
+			break;
+		default:
+			break;
+		}
+	}
+	
 	/* Default react sequence for initial entry  */
 	private void react_Microwave_Mode_r1__entry_Default() {
 		enterSequence_Microwave_Mode_r1_High_default();
@@ -720,6 +791,11 @@ public class MicrowaveStatemachine implements IMicrowaveStatemachine {
 	/* Default react sequence for initial entry  */
 	private void react_Microwave__entry_Default() {
 		enterSequence_Microwave_Idle_default();
+	}
+	
+	/* Default react sequence for initial entry  */
+	private void react_Open_Close_Door__entry_Default() {
+		enterSequence_Open_Close_Door_DoorClosed_default();
 	}
 	
 	private boolean react() {
@@ -754,8 +830,6 @@ public class MicrowaveStatemachine implements IMicrowaveStatemachine {
 			if (react()==false) {
 				if (sCInterface.open) {
 					exitSequence_Microwave_Cooking();
-					setIsDoorOpen(true);
-					
 					enterSequence_Microwave_Waiting_default();
 				} else {
 					if (getRemainingTime()==0) {
@@ -770,8 +844,6 @@ public class MicrowaveStatemachine implements IMicrowaveStatemachine {
 							
 							sCInterface.operationCallback.clearDisplay();
 							
-							setIsDoorOpen(true);
-							
 							enterSequence_Microwave_Idle_default();
 						} else {
 							did_transition = false;
@@ -782,9 +854,9 @@ public class MicrowaveStatemachine implements IMicrowaveStatemachine {
 		}
 		if (did_transition==false) {
 			if (((timeEvents[0]) && (getRemainingTime()>0))) {
-				setRemainingTime(getRemainingTime() - 1);
+				sCInterface.operationCallback.displayTime(((((getRemainingTime() / 60)) * 100) + ((getRemainingTime() % 60))));
 				
-				sCInterface.operationCallback.displayTime(getRemainingTime());
+				setRemainingTime(getRemainingTime() - 1);
 			}
 		}
 		return did_transition;
@@ -799,7 +871,14 @@ public class MicrowaveStatemachine implements IMicrowaveStatemachine {
 					exitSequence_Microwave_Mode();
 					enterSequence_Microwave_SettingTime_default();
 				} else {
-					did_transition = false;
+					if (sCInterface.stop) {
+						exitSequence_Microwave_Mode();
+						sCInterface.operationCallback.clearDisplay();
+						
+						enterSequence_Microwave_Idle_default();
+					} else {
+						did_transition = false;
+					}
 				}
 			}
 		}
@@ -851,14 +930,10 @@ public class MicrowaveStatemachine implements IMicrowaveStatemachine {
 					
 					sCInterface.operationCallback.clearDisplay();
 					
-					setIsDoorOpen(true);
-					
 					enterSequence_Microwave_Idle_default();
 				} else {
 					if (sCInterface.close) {
 						exitSequence_Microwave_Waiting();
-						setIsDoorOpen(false);
-						
 						enterSequence_Microwave_RestartCooking_default();
 					} else {
 						did_transition = false;
@@ -874,7 +949,7 @@ public class MicrowaveStatemachine implements IMicrowaveStatemachine {
 		
 		if (try_transition) {
 			if (react()==false) {
-				if (((sCInterface.start) && ((getEnteredTime()>0 && !getIsDoorOpen())))) {
+				if (((sCInterface.start) && ((getEnteredTime()>0 && getIsDoorClose())))) {
 					exitSequence_Microwave_SettingTime();
 					setRemainingTime(enteredTime);
 					
@@ -882,7 +957,18 @@ public class MicrowaveStatemachine implements IMicrowaveStatemachine {
 					
 					enterSequence_Microwave_Cooking_default();
 				} else {
-					did_transition = false;
+					if (sCInterface.stop) {
+						exitSequence_Microwave_SettingTime();
+						sCInterface.operationCallback.stopCook();
+						
+						sCInterface.operationCallback.beepOff();
+						
+						sCInterface.operationCallback.clearDisplay();
+						
+						enterSequence_Microwave_Idle_default();
+					} else {
+						did_transition = false;
+					}
 				}
 			}
 		}
@@ -890,7 +976,7 @@ public class MicrowaveStatemachine implements IMicrowaveStatemachine {
 			if (((sCInterface.digit) && (getEnteredTime()<1000))) {
 				setEnteredTime((((enteredTime * 10)) + sCInterface.getDigitValue()));
 				
-				sCInterface.operationCallback.displayTime(getEnteredTime());
+				sCInterface.operationCallback.displayTime(((((getEnteredTime() / 60)) * 100) + ((getEnteredTime() % 60))));
 			}
 		}
 		return did_transition;
@@ -901,7 +987,7 @@ public class MicrowaveStatemachine implements IMicrowaveStatemachine {
 		
 		if (try_transition) {
 			if (react()==false) {
-				if (((sCInterface.start) && (!getIsDoorOpen()))) {
+				if (((sCInterface.start) && (getIsDoorClose()))) {
 					exitSequence_Microwave_RestartCooking();
 					sCInterface.operationCallback.cook();
 					
@@ -961,6 +1047,34 @@ public class MicrowaveStatemachine implements IMicrowaveStatemachine {
 				} else {
 					did_transition = false;
 				}
+			}
+		}
+		return did_transition;
+	}
+	
+	private boolean open_Close_Door_DoorOpen_react(boolean try_transition) {
+		boolean did_transition = try_transition;
+		
+		if (try_transition) {
+			if (sCInterface.close) {
+				exitSequence_Open_Close_Door_DoorOpen();
+				enterSequence_Open_Close_Door_DoorClosed_default();
+			} else {
+				did_transition = false;
+			}
+		}
+		return did_transition;
+	}
+	
+	private boolean open_Close_Door_DoorClosed_react(boolean try_transition) {
+		boolean did_transition = try_transition;
+		
+		if (try_transition) {
+			if (sCInterface.open) {
+				exitSequence_Open_Close_Door_DoorClosed();
+				enterSequence_Open_Close_Door_DoorOpen_default();
+			} else {
+				did_transition = false;
 			}
 		}
 		return did_transition;
