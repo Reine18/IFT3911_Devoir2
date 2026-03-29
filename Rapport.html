@@ -36,7 +36,7 @@ img { max-width: 100%; margin-top: 15px; }
 <li><strong>Dabo Fahîma :</strong> tunwend-raabo.fahima.c.dabo@umontreal.ca | Matricule : 6362 | Temps investi : 38 heures </li><br>
 <li><strong>Jean Paul Marc Olivier  :</strong>  marc.olivier.jean.paul@umontreal.ca | Matricule : 1763 | Temps investi : 40 heures</li><br>
 <li><strong>Guinguiere Reine :</strong> wendkuni.reine.rosine.guinguiere@umontreal.ca | Matricule : 1523 | Temps investi : 36 heures</li><br>
-<li><strong>RahmouniAbdelghafour :</strong> abdel.ghafour.rahmouni@umontreal.ca | Matricule : 6224 | Temps investi : 39 heures</li>
+<li><strong>Rahmouni Abdelghafour :</strong> abdel.ghafour.rahmouni@umontreal.ca | Matricule : 6224 | Temps investi : 39 heures</li>
 </ul>
 
 <br>
@@ -44,16 +44,22 @@ img { max-width: 100%; margin-top: 15px; }
 <div class="Réseau de Pétri">
 <h2>1. Réseau de Pétri : Tunnel</h2>
 <img src="Reseau_de_Petri\3911_petri.png" alt="Réseau de Pétri - Tunnel">
-<p>Ce réseau de Pétri modélise avec la gestion d'une ressource critique partagée, 
-  en imposant une exclusion mutuelle et une équité entre Montréal et la rive Sud. La circulation 
-  est régulée par la place centrale <i>tunnelDispo</i>, qui agit comme suit : elle possède un seul 
-  jeton initial, elle interdit physiquement l'entrée d'une seconde voiture tant que la précédente n'a pas 
-  franchi la transition de sortie (sortir...), garantissant ainsi qu'une seule voiture occupe le tunnel à la fois. 
-  L'équité est assurée par le cycle des places lumiereMontreal et lumiereRiveSud : le jeton d'autorisation 
-  n'est rendu à la rive opposée qu'une fois la traversée complétée, ce qui force une alternance systématique 
-  et empêche toute "famine" ou monopolisation du tunnel par un flux continu d'un seul côté. Enfin, l'utilisation 
-  de poids d'arcs spécifiques (3) pour l'état interne du tunnel permet de modéliser une capacité de transit ou une 
-  durée de traversée. Un passage ne peut etre possible que si la voiture a le jeton de <i>lumiereMontreal</i> ET celui de <i>tunnelDispo</i></p>
+<p>
+  Ce réseau de Pétri modélise avec la gestion d'une ressource critique partagée, 
+  en imposant une exclusion mutuelle et une équité entre Montréal et la rive Sud.
+  Un réseau de Pétri est conservateur pour un vecteur de pondération donné si la 
+  somme pondérée des jetons dans les places est constante pour toutes les configurations atteignables du réseau.
+  Dans notre modèle, la place <i>tunnelDispo</i> est initialisée avec un jeton, ce qui signifie que le tunnel est disponible pour une voiture.
+  Les places <i>tunnelVersRiveSud</i> et <i>tunnelVersMontreal</i> sont initialisées à zéro, indiquant qu'aucune voiture n'est actuellement dans le tunnel.
+  Donc en faisant la somme, cela donne : M(tunnelDispo) + M(tunnelVersRiveSud) + M(tunnelVersMontreal) = 1, ce qui montre que le réseau est conservateur pour ce vecteur de pondération.
+</p>
+
+<img src="Reseau_de_Petri\graphe_couverture.jpeg" alt="Graphe de couverture - Tunnel">
+<p>
+  Le graphe de couverture montre que toutes les configurations possibles du réseau de Pétri sont atteignables à partir de l'état initial.
+  Il montre aussi que le système est équitable de part et d'autre du tunnel, car les transitions permettant de traverser le tunnel
+  alternent entre les deux côtés chaque fois qu'une voiture traverse. Cela empêche la famine où un des côtés monopoliserait le tunnel.
+</p>
 
 </div>
 
