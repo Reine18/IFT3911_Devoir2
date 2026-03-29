@@ -44,10 +44,16 @@ img { max-width: 100%; margin-top: 15px; }
 <div class="Réseau de Pétri">
 <h2>1. Réseau de Pétri : Tunnel</h2>
 <img src="Reseau_de_Petri\3911_petri.png" alt="Réseau de Pétri - Tunnel">
-<p>Le réseau de Pétri modélise le comportement du tunnel en représentant les états et les transitions. Dans un tunnel, les ressources (points) représentent 
-  une voiture dans le tunnel et les autorisations d'entrée (la lumière d'autorisation et la disponibilité du tunnel). Pour traverser le tunnel il faut donc 
-  obligatoirement que la voiture soit présente, que la lumière d'autorisation soit verte et que le tunnel soit disponible. De cette facon, les voitures peuvent
-  traverser le tunnel de manière sécurisée, en évitant les collisions et en assurant une circulation fluide.
+<p>Ce réseau de Pétri modélise avec la gestion d'une ressource critique partagée, 
+  en imposant une exclusion mutuelle et une équité entre Montréal et la rive Sud. La circulation 
+  est régulée par la place centrale <i>tunnelDispo</i>, qui agit comme suit : elle possède un seul 
+  jeton initial, elle interdit physiquement l'entrée d'une seconde voiture tant que la précédente n'a pas 
+  franchi la transition de sortie (sortir...), garantissant ainsi qu'une seule voiture occupe le tunnel à la fois. 
+  L'équité est assurée par le cycle des places lumiereMontreal et lumiereRiveSud : le jeton d'autorisation 
+  n'est rendu à la rive opposée qu'une fois la traversée complétée, ce qui force une alternance systématique 
+  et empêche toute "famine" ou monopolisation du tunnel par un flux continu d'un seul côté. Enfin, l'utilisation 
+  de poids d'arcs spécifiques (3) pour l'état interne du tunnel permet de modéliser une capacité de transit ou une 
+  durée de traversée. Un passage ne peut etre possible que si la voiture a le jeton de <i>lumiereMontreal</i> ET celui de <i>tunnelDispo</i></p>
 
 </div>
 
