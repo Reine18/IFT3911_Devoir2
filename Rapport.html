@@ -43,13 +43,25 @@ img { max-width: 100%; margin-top: 15px; }
 
 <div class="Réseau de Pétri">
 <h2>1. Réseau de Pétri : Tunnel</h2>
-<img src="3911_petri.png" alt="Réseau de Pétri - Tunnel">
+<img src="Reseau_de_Petri\3911_petri.png" alt="Réseau de Pétri - Tunnel">
+<p>Le réseau de Pétri modélise le comportement du tunnel en représentant les états et les transitions. Dans un tunnel, les ressources (points) représentent 
+  une voiture dans le tunnel et les autorisations d'entrée (la lumière d'autorisation et la disponibilité du tunnel). Pour traverser le tunnel il faut donc 
+  obligatoirement que la voiture soit présente, que la lumière d'autorisation soit verte et que le tunnel soit disponible. De cette facon, les voitures peuvent
+  traverser le tunnel de manière sécurisée, en évitant les collisions et en assurant une circulation fluide.
 
 </div>
 
 <div class="Statechart">
 <h2>2. Statechart: Four à micro-onde</h2>
+<img src="Statechart\Microwave\Microwave\images\microwave.png" alt="Statechart - Four à micro-onde">
+<p>Le statechart modélise le comportement du four à micro-onde en représentant les états et les transitions. Il permet de visualiser les différentes phases de fonctionnement du four, ainsi que les conditions de passage d'un état à un autre.
+  Il a été modélisé de facon à ce que l'utilisateur puisse basculer d'une puissance de cuisson à une autre, qu'il puisse
+  saisir son temps de cuisson et qu'il puisse aussi arrêter la cuisson à tout moment. 
+  De plus, le statechart prend en compte les différentes interactions possibles avec le four, telles que l'ouverture de la porte pendant la cuisson, ce qui entraîne une transition vers un état sécuritaire arrêtant la cuisson.
+  <p>L'énoncé indique que la porte peut etre ouverte ou fermée en tout temps, pour modéliser ce principe nous avons ajouté une nouvelle région qui s'execute en parallèle de la région Microwave et qui gère l'ouverture et la fermeture de la porte. 
+  Pour empecher la cuisson lorsque la porte est ouverte, une variable booleenne a été ajoutée pour indiquer si la porte est ouverte ou fermée. L'utilisateur peut également arrêter le processus à n'importe qu'elle étape.</p>
 
+</p>
 
 </div>
 
@@ -68,9 +80,9 @@ Le diagramme de paqets a aussi ete remanié pour mieux refléter les dépendance
 <br></br> </br></br></b>
 
 <b>Diagramme de classe revisé </b>
-<img src="correction_devoir_1/Design/images/Diagramme de classe.svg" alt="Diagramme de classe Revisé"> <br><br></br></br></b>
+<img src="Design\Design\img_design\Diagramme de classe.svg" alt="Diagramme de classe Revisé"> <br><br></br></br></b>
 <b>Diagramme de paquets Revisé</b>
-<img src="correction_devoir_1/Design/images/Diagramme_de_paquet.svg" alt="Diagramme de paquets Revisé">
+<img src="Design/Design/img_design/Diagramme_de_paquet.svg" alt="Diagramme de paquets Revisé">
 
 </br></br></br></br>
 
@@ -150,7 +162,7 @@ sans créer de dépendances cycliques. Ce module assure que les règles propres 
 <div class="GrapheAI">
 
     <h3>4.1 Graphe AI </h3>
-<img src="correction_devoir_1/Design/img_design/graphAI.svg" alt="Graphe IA">
+<img src="Design\Design\img_design\graphAI.svg" alt="Graphe IA">
 <p> <b> Interpretation </b></p>
 <p>
  Ce graphe AI( Abstraction/Instabilité) nous permet d'evaluer la qualité de notre conception logicielle en se basant sur l'equilibre 
@@ -158,7 +170,7 @@ sans créer de dépendances cycliques. Ce module assure que les règles propres 
  La ligne diagonale ( rouge en pointillés) qui definie ici la realtion A + I = 1 représente la zone d'équilibre idéale , 
  où une classe stable est absatraite et une classe instable peut etre concrète. <br>
  Dans notre cas précis, la majorité des paquets du Systeme se situent en dessous de la zone d'équilibre , ce qui indique que ces derniers sont globalement concrèts  par rapport à leur niveau d'instabilité.
- Cela correspond à la zone de rigidité caractérisée par des classes difficiles à modifier et peu flexibles .
+ Cela correspond à la zone de rigidité caractérisée par des classes difficiles à modifier et peu flexibles.
 </p>
 </div>
 
@@ -166,7 +178,7 @@ sans créer de dépendances cycliques. Ce module assure que les règles propres 
 <div class="Fardeaux">
 
 <h3>4.2 Fardeaux </h3>
-<iframe src ="fardeau/fardeau.pdf#zoom=page-width" class=" fullscreen-iframe" allowfullscreen></iframe>
+<iframe src ="Design\fardeau.pdf#zoom=page-width" class=" fullscreen-iframe" allowfullscreen></iframe>
 
 
 </div>
